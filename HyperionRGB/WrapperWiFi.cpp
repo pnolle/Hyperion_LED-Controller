@@ -1,4 +1,5 @@
 #include "WrapperWiFi.h"
+#include "stdint.h"
 
 WrapperWiFi::WrapperWiFi(const char* ssid, const char* password, const char* hostname) {  
   _ssid = ssid;
@@ -41,14 +42,25 @@ bool WrapperWiFi::connect(void) {
   
   WiFi.begin(_ssid, _password);
 
+  // while (WiFi.waitForConnectResult() != WL_CONNECTED) {
+  //   delay(1000);
+  //   Log.info("WL not connected, trying again... %s / %s", _ssid, _password);
+  //   WiFi.begin(_ssid, _password);
+  // }
+
   return (WiFi.waitForConnectResult() == WL_CONNECTED);
+  // return (WiFi.status() == WL_CONNECTED);
 }
 void WrapperWiFi::begin(void) {
-  for (uint8 i=0; i<5; i++) {
+  for (uint8_t i=0; i<5; i++) {
     if (connect()) {
+      Serial.print(WiFi.localIP());
       Log.info("Connected successfully, IP address: %s", WiFi.localIP().toString().c_str());
       _apMode = false;
       return;
+    }
+    else {
+      Log.info("No Wifi connection. Trying again.");
     }
   }
   
@@ -84,4 +96,3 @@ bool WrapperWiFi::isAPConnected(void) {
     return false;
   return (WiFi.softAPgetStationNum() > 0);
 }
-

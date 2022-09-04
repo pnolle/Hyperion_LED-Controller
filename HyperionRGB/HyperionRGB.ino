@@ -16,7 +16,7 @@
 #include "WrapperWebconfig.h"
 #include <DNSServer.h>
 
-#define LED LED_BUILTIN // LED in NodeMCU at pin GPIO16 (D0) or LED_BUILTIN @Lolin32.
+#define LED 27 //LED_BUILTIN // LED in NodeMCU at pin GPIO16 (D0) or LED_BUILTIN @Lolin32.
 int ledState = LOW;
 
 LoggerInit loggerInit;

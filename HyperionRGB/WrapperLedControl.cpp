@@ -3,6 +3,9 @@
 void WrapperLedControl::begin(uint16_t ledCount) {
   _ledCount = ledCount;
 
+  Serial.print("FASTLED_VERSION ");
+  Serial.println(FASTLED_VERSION);
+
   #ifdef CONFIG_LED_CLOCKLESS_CHIPSET
     Log.debug("Chipset=%s, dataPin=%i, clockPin=%s, colorOrder=%i, ledCount=%i", "Clockless", CONFIG_LED_DATAPIN, "NONE", CONFIG_LED_COLOR_ORDER, ledCount);
   #elif defined CONFIG_LED_PWM
@@ -18,7 +21,8 @@ void WrapperLedControl::begin(uint16_t ledCount) {
   _fire2012Heat = new byte[_ledCount];
   
   #ifdef CONFIG_LED_CLOCKLESS_CHIPSET
-    FastLED.addLeds<CONFIG_LED_CLOCKLESS_CHIPSET, CONFIG_LED_DATAPIN, CONFIG_LED_COLOR_ORDER>(leds, _ledCount);
+    // FastLED.addLeds<CONFIG_LED_CLOCKLESS_CHIPSET, CONFIG_LED_DATAPIN, CONFIG_LED_COLOR_ORDER>(leds, _ledCount);
+    FastLED.addLeds<CONFIG_LED_CLOCKLESS_CHIPSET, CONFIG_LED_DATAPIN>(leds, _ledCount);
   #elif defined CONFIG_LED_PWM
     //Nothing to to
   #else
@@ -32,6 +36,7 @@ void WrapperLedControl::show(void) {
     analogWrite(CONFIG_LED_PWM_GREEN, map(leds[0].green, 0, 255, 0, PWMRANGE));
     analogWrite(CONFIG_LED_PWM_BLUE, map(leds[0].blue, 0, 255, 0, PWMRANGE));
   #else
+    Serial.println("WrapperLedControl::show");
     FastLED.show();
   #endif
 }
@@ -94,8 +99,11 @@ CRGB WrapperLedControl::wheel(byte wheelPos) {
 
 void WrapperLedControl::rainbowV2Step(void) {
   for (uint16_t i=0; i < _ledCount; i++) {
-    leds[i] = wheel(((i + _rainbowV2StepState) % _ledCount) * 255 / _ledCount);
+    leds[i] = wheel(i);
+    // leds[i] = wheel(((i + _rainbowV2StepState) % _ledCount) * 255 / _ledCount);  // warum wird das hier auf 255 gestreckt?
   }  
+  Serial.print("rainbowV2Step for # of LEDs ");
+  Serial.println(_ledCount);
   show();
   
   if (_rainbowV2StepState < _ledCount) {
